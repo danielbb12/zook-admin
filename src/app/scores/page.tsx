@@ -5,19 +5,41 @@ import ScoresClient from './ScoresClient'
 export default async function ScoresPage() {
   const supabase = createAdminClient()
 
+  // Fetch all tables without embedded JOINs — avoids FK dependency in schema cache
   const [
-    { data: videoScores },
-    { data: creatorScores },
-    { data: userScores },
-    { data: videos },
-    { data: profiles },
+    { data: videoScores, error: videoError },
+    { data: creatorScores, error: creatorError },
+    { data: userScores, error: userError },
+    { data: videos, error: videosError },
+    { data: profiles, error: profilesError },
   ] = await Promise.all([
-    supabase.from('video_scores').select('video_id, score, total_likes, total_saves, total_gifts, updated_at').order('score', { ascending: false }).limit(300),
-    supabase.from('creator_scores').select('user_id, score, avg_video_score, follower_growth, engagement_rate, violation_count').order('score', { ascending: false }).limit(300),
-    supabase.from('user_scores').select('user_id, score, positive_actions, valid_reports, received_blocks, bad_word_attempts').order('score', { ascending: false }).limit(300),
+    supabase
+      .from('video_scores')
+      .select('video_id, score, total_likes, total_saves, total_gifts, updated_at')
+      .order('score', { ascending: false })
+      .limit(300),
+    supabase
+      .from('creator_scores')
+      .select('user_id, score, avg_video_score, follower_growth, engagement_rate, violation_count')
+      .order('score', { ascending: false })
+      .limit(300),
+    supabase
+      .from('user_scores')
+      .select('user_id, score, positive_actions, valid_reports, received_blocks, bad_word_attempts')
+      .order('score', { ascending: false })
+      .limit(300),
     supabase.from('videos').select('id, title, creator_id').limit(500),
-    supabase.from('profiles').select('id, display_name, username').limit(1000),
+    supabase.from('profiles').select('id, display_name, username').limit(5000),
   ])
+
+  if (videoError) console.error('[scores] video_scores:', videoError.message)
+  if (creatorError) console.error('[scores] creator_scores:', creatorError.message)
+  if (userError) console.error('[scores] user_scores:', userError.message)
+  if (videosError) console.error('[scores] videos:', videosError.message)
+  if (profilesError) console.error('[scores] profiles:', profilesError.message)
+
+  console.log('[scores] rows — creator_scores:', creatorScores?.length ?? 'null', '| user_scores:', userScores?.length ?? 'null', '| profiles:', profiles?.length ?? 'null')
+  if (creatorScores?.length) console.log('[scores] creator_scores sample:', creatorScores[0])
 
   const videoMap = Object.fromEntries((videos ?? []).map((v) => [v.id, v]))
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]))

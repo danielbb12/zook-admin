@@ -12,6 +12,7 @@ import {
   HiCog6Tooth,
   HiChartBar,
   HiTag,
+  HiLifebuoy,
 } from 'react-icons/hi2'
 import type { ComponentType } from 'react'
 
@@ -19,24 +20,28 @@ interface NavItem {
   href: string
   label: string
   icon: ComponentType<{ className?: string }>
-  badge?: string
+  badge?: string | number
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'דשבורד', icon: HiSquares2X2 },
-  { href: '/reports', label: 'דיווחים', icon: HiBell, badge: '6' },
-  { href: '/users', label: 'משתמשים', icon: HiUsers },
-  { href: '/creators', label: 'יוצרים', icon: HiStar, badge: '3' },
-  { href: '/content', label: 'תוכן וסרטונים', icon: HiVideoCamera },
-  { href: '/gifts', label: 'מתנות', icon: HiGift },
-  { href: '/categories', label: 'קטגוריות', icon: HiTag },
-  { href: '/scores', label: 'דירוגים', icon: HiChartBar },
-  { href: '/notifications', label: 'התראות', icon: HiBell },
-  { href: '/settings', label: 'הגדרות', icon: HiCog6Tooth },
-]
+function buildNavItems(openSupportCount: number): NavItem[] {
+  return [
+    { href: '/dashboard', label: 'דשבורד', icon: HiSquares2X2 },
+    { href: '/reports', label: 'דיווחים', icon: HiBell, badge: '6' },
+    { href: '/users', label: 'משתמשים', icon: HiUsers },
+    { href: '/creators', label: 'יוצרים', icon: HiStar, badge: '3' },
+    { href: '/content', label: 'תוכן וסרטונים', icon: HiVideoCamera },
+    { href: '/gifts', label: 'מתנות', icon: HiGift },
+    { href: '/categories', label: 'קטגוריות', icon: HiTag },
+    { href: '/scores', label: 'דירוגים', icon: HiChartBar },
+    { href: '/support', label: 'תמיכה ופניות', icon: HiLifebuoy, badge: openSupportCount > 0 ? openSupportCount : undefined },
+    { href: '/notifications', label: 'התראות', icon: HiBell },
+    { href: '/settings', label: 'הגדרות', icon: HiCog6Tooth },
+  ]
+}
 
-export default function Sidebar() {
+export default function Sidebar({ openSupportCount = 0 }: { openSupportCount?: number }) {
   const pathname = usePathname()
+  const NAV_ITEMS = buildNavItems(openSupportCount)
 
   return (
     <aside className="fixed right-0 top-0 h-screen w-[240px] bg-[#0F2547] flex flex-col z-40">
@@ -65,7 +70,7 @@ export default function Sidebar() {
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {item.badge && (
+              {item.badge != null && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                   {item.badge}
                 </span>

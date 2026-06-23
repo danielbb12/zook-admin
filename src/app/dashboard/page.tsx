@@ -5,7 +5,7 @@ import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
 import UserGrowthChart from './UserGrowthChart'
 import GiftsPieChart from './GiftsPieChart'
-import { HiUsers, HiVideoCamera, HiExclamationCircle, HiArrowTrendingUp } from 'react-icons/hi2'
+import { HiUsers, HiVideoCamera, HiExclamationCircle, HiArrowTrendingUp, HiLifebuoy } from 'react-icons/hi2'
 
 function startOfDay(d: Date) {
   const r = new Date(d)
@@ -31,6 +31,7 @@ export default async function DashboardPage() {
     { count: mauCount },
     { count: videosToday },
     { count: pendingCount },
+    { count: openSupportCount },
     { data: recentProfiles },
     { data: recentVideos },
     { data: allGifts },
@@ -39,6 +40,7 @@ export default async function DashboardPage() {
     supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('last_active', thirtyDaysAgo.toISOString()),
     supabase.from('videos').select('*', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
     supabase.from('videos').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('status', 'open'),
     supabase.from('profiles').select('created_at').gte('created_at', sevenDaysAgo.toISOString()).order('created_at'),
     supabase.from('videos').select('id, title, status, created_at, creator_id').eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
     supabase.from('gifts').select('gift_type'),
@@ -85,11 +87,12 @@ export default async function DashboardPage() {
     <div>
       <PageHeader title="דשבורד" subtitle="סקירה כללית של פעילות הפלטפורמה" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <StatCard icon={<HiUsers className="w-5 h-5" />} label="DAU – פעילים היום" value={dauCount ?? 0} sparkline={growthData.map((d) => d.users)} />
         <StatCard icon={<HiArrowTrendingUp className="w-5 h-5" />} label="MAU – פעילים 30 יום" value={mauCount ?? 0} />
         <StatCard icon={<HiVideoCamera className="w-5 h-5" />} label="זוקים היום" value={videosToday ?? 0} />
         <StatCard icon={<HiExclamationCircle className="w-5 h-5" />} label="ממתינים לאישור" value={pendingCount ?? 0} color="text-red-500" />
+        <StatCard icon={<HiLifebuoy className="w-5 h-5" />} label="פניות פתוחות" value={openSupportCount ?? 0} color="text-amber-500" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">

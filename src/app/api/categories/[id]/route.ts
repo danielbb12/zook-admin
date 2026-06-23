@@ -14,11 +14,19 @@ export async function DELETE(_req: NextRequest, ctx: RouteContext<'/api/categori
   const { id } = await ctx.params
   const supabase = createAdminClient()
 
-  // Only delete if no videos reference this category
+  // Fetch the category name to check videos by name
+  const { data: cat, error: catError } = await supabase
+    .from('categories')
+    .select('name')
+    .eq('id', id)
+    .single()
+
+  if (catError || !cat) return Response.json({ error: 'קטגוריה לא נמצאה' }, { status: 404 })
+
   const { count } = await supabase
     .from('videos')
     .select('*', { count: 'exact', head: true })
-    .eq('category', id)
+    .eq('category', cat.name)
 
   if ((count ?? 0) > 0) {
     return Response.json({ error: 'לא ניתן למחוק קטגוריה עם סרטונים' }, { status: 400 })
