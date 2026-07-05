@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { HiInformationCircle } from 'react-icons/hi2'
 
 const SUB_NAV = [
   { key: 'general', label: 'כללי' },
@@ -22,15 +23,23 @@ interface GeneralSettings {
   videoMaxSec: number
 }
 
+interface CoinsSettings {
+  dailyCoins: number
+  coinsCap: number
+}
+
 const MOCK_AUDIT = [
   { id: 1, action: 'עדכון הגדרות כלליות', user: 'דניאל מזרחי', at: '2026-06-09T10:30:00' },
   { id: 2, action: 'השעיית יוצר #abc123', user: 'דניאל מזרחי', at: '2026-06-09T09:15:00' },
   { id: 3, action: 'אישור דיווח #def456', user: 'דניאל מזרחי', at: '2026-06-08T18:45:00' },
 ]
 
-export default function SettingsClient() {
+export default function SettingsClient({ initialCoins }: { initialCoins: CoinsSettings }) {
   const [activeTab, setActiveTab] = useState('general')
   const [saved, setSaved] = useState(false)
+  const [coinsSaved, setCoinsSaved] = useState(false)
+  const [coinsSaving, setCoinsSaving] = useState(false)
+  const [coins, setCoins] = useState<CoinsSettings>(initialCoins)
   const [settings, setSettings] = useState<GeneralSettings>({
     appName: 'ZOOK',
     domain: 'zook.app',
@@ -44,6 +53,18 @@ export default function SettingsClient() {
   function handleSave() {
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  async function handleSaveCoins() {
+    setCoinsSaving(true)
+    await fetch('/api/settings/coins', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ daily_coins: coins.dailyCoins, coins_cap: coins.coinsCap }),
+    })
+    setCoinsSaving(false)
+    setCoinsSaved(true)
+    setTimeout(() => setCoinsSaved(false), 3000)
   }
 
   return (
@@ -166,6 +187,65 @@ export default function SettingsClient() {
               className="px-6 py-2.5 bg-[#185FA5] text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               שמור שינויים
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'general' && (
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-5 mt-4">
+            <h2 className="text-base font-semibold text-slate-800 border-b border-slate-100 pb-4">זוקים יומיים</h2>
+
+            {coinsSaved && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-green-700 text-sm">
+                ✓ הגדרות הזוקים נשמרו
+              </div>
+            )}
+
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+              <HiInformationCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700">
+                שינויים כאן ישפיעו על הפונקציה <span className="font-mono font-semibold">refresh_daily_coins</span> שרצה אוטומטית בחצות.
+                הפונקציה מוסיפה את "זוקים יומיים" לכל משתמש, עד לתקרת האגירה.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  זוקים יומיים
+                  <span className="mr-1.5 text-xs text-slate-400 font-normal">(נוסף לכל משתמש בכל יום)</span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={1000}
+                  value={coins.dailyCoins}
+                  onChange={(e) => setCoins({ ...coins, dailyCoins: +e.target.value })}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  תקרת אגירה
+                  <span className="mr-1.5 text-xs text-slate-400 font-normal">(מקסימום זוקים שניתן לצבור)</span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={10000}
+                  value={coins.coinsCap}
+                  onChange={(e) => setCoins({ ...coins, coinsCap: +e.target.value })}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleSaveCoins}
+              disabled={coinsSaving}
+              className="px-6 py-2.5 bg-[#185FA5] text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {coinsSaving ? 'שומר...' : 'שמור הגדרות זוקים'}
             </button>
           </div>
         )}

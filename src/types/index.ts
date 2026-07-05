@@ -2,9 +2,15 @@ export type Profile = {
   id: string
   username: string | null
   display_name: string | null
+  bio: string | null
+  avatar_id: string | null
   is_creator: boolean | null
   streak_days: number | null
+  last_seen: string | null
   created_at: string
+  zook_coins: number | null
+  notification_prefs: Record<string, unknown> | null
+  privacy_prefs: Record<string, unknown> | null
 }
 
 export type Video = {

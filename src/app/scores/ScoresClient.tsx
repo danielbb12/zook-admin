@@ -19,7 +19,7 @@ interface VideoScoreRow {
 }
 
 interface CreatorScoreRow {
-  user_id: string | null
+  creator_id: string | null
   score: number | null
   avg_video_score: number | null
   follower_growth: number | null
@@ -231,10 +231,10 @@ function CreatorScoresTab({
                 </td>
               </tr>
             ) : paged.map((r, i) => {
-              const viewerScore = r.user_id ? (userScoreMap[r.user_id] ?? null) : null
-              const isRecalc = r.user_id ? recalculating.has(r.user_id) : false
+              const viewerScore = r.creator_id ? (userScoreMap[r.creator_id] ?? null) : null
+              const isRecalc = r.creator_id ? recalculating.has(r.creator_id) : false
               return (
-                <Fragment key={r.user_id ?? i}>
+                <Fragment key={r.creator_id ?? i}>
                   {/* Creator row */}
                   <tr className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3 text-slate-400 text-xs">{(page - 1) * PAGE_SIZE + i + 1}</td>
@@ -268,16 +268,16 @@ function CreatorScoresTab({
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {r.user_id && (
+                      {r.creator_id && (
                         <div className="flex items-center gap-1.5">
                           <button
-                            onClick={() => setPenalizingId(r.user_id!)}
+                            onClick={() => setPenalizingId(r.creator_id!)}
                             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
                           >
                             <HiExclamationTriangle className="w-3.5 h-3.5" /> הענש
                           </button>
                           <button
-                            onClick={() => recalculate(r.user_id!)}
+                            onClick={() => recalculate(r.creator_id!)}
                             disabled={isRecalc}
                             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
                           >

@@ -20,7 +20,7 @@ export default async function ScoresPage() {
       .limit(300),
     supabase
       .from('creator_scores')
-      .select('user_id, score, avg_video_score, follower_growth, engagement_rate, violation_count')
+      .select('creator_id, score, avg_video_score, follower_growth, engagement_rate, violation_count')
       .order('score', { ascending: false })
       .limit(300),
     supabase
@@ -56,7 +56,7 @@ export default async function ScoresPage() {
 
   const creatorScoreRows = (creatorScores ?? []).map((s) => ({
     ...s,
-    profile: s.user_id ? (profileMap[s.user_id] ?? null) : null,
+    profile: s.creator_id ? (profileMap[s.creator_id] ?? null) : null,
   }))
 
   const userScoreRows = (userScores ?? []).map((s) => ({

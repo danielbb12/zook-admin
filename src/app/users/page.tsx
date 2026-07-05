@@ -7,7 +7,7 @@ export default async function UsersPage() {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, is_creator, streak_days, created_at')
+    .select('id, username, display_name, bio, avatar_id, is_creator, streak_days, zook_coins, last_seen, created_at, notification_prefs, privacy_prefs')
     .order('created_at', { ascending: false })
     .limit(500)
 
