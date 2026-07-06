@@ -10,6 +10,8 @@ import { HiCheck, HiXMark, HiPlayCircle } from 'react-icons/hi2'
 const PAGE_SIZE = 20
 
 const STATUS_OPTIONS = [
+  { value: 'pending_review', label: 'ממתין לאישור' },
+  { value: 'processing', label: 'בעיבוד' },
   { value: 'pending', label: 'ממתינים לאישור' },
   { value: 'active', label: 'פעיל' },
   { value: 'rejected', label: 'נדחה' },
@@ -193,7 +195,7 @@ export default function ContentClient({ data }: { data: VideoRow[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">
-                    {v.status === 'pending' && (
+                    {(v.status === 'pending' || v.status === 'pending_review') && (
                       <>
                         <button
                           onClick={() => approve(v.id)}

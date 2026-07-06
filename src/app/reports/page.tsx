@@ -8,7 +8,7 @@ export default async function ReportsPage() {
   const { data: videos, error } = await supabase
     .from('videos')
     .select('id, title, status, created_at, creator_id')
-    .in('status', ['pending', 'flagged'])
+    .in('status', ['pending', 'pending_review', 'flagged'])
     .order('created_at', { ascending: false })
     .limit(200)
 

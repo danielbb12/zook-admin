@@ -39,10 +39,10 @@ export default async function DashboardPage() {
     supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('last_active', today.toISOString()),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('last_active', thirtyDaysAgo.toISOString()),
     supabase.from('videos').select('*', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
-    supabase.from('videos').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('videos').select('*', { count: 'exact', head: true }).in('status', ['pending', 'pending_review']),
     supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('status', 'open'),
     supabase.from('profiles').select('created_at').gte('created_at', sevenDaysAgo.toISOString()).order('created_at'),
-    supabase.from('videos').select('id, title, status, created_at, creator_id').eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
+    supabase.from('videos').select('id, title, status, created_at, creator_id').in('status', ['pending', 'pending_review']).order('created_at', { ascending: false }).limit(5),
     supabase.from('gifts').select('gift_type'),
   ])
 
